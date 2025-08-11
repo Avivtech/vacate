@@ -17,8 +17,10 @@ const fetchViaAllOriginsRaw = async (url) => {
 
 const fetchHTML = async (url) => {
 	try {
+		console.log("Fetching via allorigins/get");
 		return await fetchViaAllOriginsGet(url);
 	} catch {
+		console.log("Fetching via allorigins/raw");
 		return await fetchViaAllOriginsRaw(url);
 	}
 };
@@ -97,17 +99,25 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
       `;
 
 		// Swiper container (unique per item)
+    const sliderWrap = document.createElement("div");
+    sliderWrap.classList.add("images-slider-wrap");
+
 		const swiperEl = document.createElement("div");
 		swiperEl.classList.add("swiper");
+
 		const wrapperEl = document.createElement("div");
 		wrapperEl.classList.add("swiper-wrapper");
+
 		const paginationEl = document.createElement("div");
 		paginationEl.classList.add("swiper-pagination");
+
 		swiperEl.appendChild(wrapperEl);
 		swiperEl.appendChild(paginationEl);
 
+    sliderWrap.appendChild(swiperEl);
+
 		accItem.appendChild(accInfo);
-		accItem.appendChild(swiperEl);
+		accItem.appendChild(sliderWrap);
 		listEl.appendChild(accItem);
 
 		// --- Extract images (gallery-first, with a fallback)
