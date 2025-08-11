@@ -1,6 +1,7 @@
 document.getElementById("getHotelDataBtn").addEventListener("click", async () => {
 	const input = document.getElementById("urlInput");
 	let url = input.value.trim();
+	console.log("Input URL:", url);
 
 	// URL parameters
 	const urlParams = new URLSearchParams(window.location.search);
