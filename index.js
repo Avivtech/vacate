@@ -2,6 +2,10 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 	const input = document.getElementById("urlInput");
 	let url = input.value.trim();
 
+	// URL parameters
+	const urlParams = new URLSearchParams(window.location.search);
+	console.log("URL Parameters:", Object.fromEntries(urlParams.entries()));
+
 	// Basic validation
 	if (!url || !url.startsWith("http")) {
 		alert("Enter a valid URL that starts with http or https");
