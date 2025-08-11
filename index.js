@@ -54,15 +54,15 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 		}
 
 		resultEl.innerHTML = `
-      <strong>Name:</strong> ${name}<br>
-      <strong>Rating:</strong> ${rating}<br>
-      <strong>Address:</strong> ${address}<br>
-      <strong>Map Link:</strong> <a href="${mapLink}" target="_blank">${mapLink}</a><br>
-      <strong>Check-in:</strong> ${checkIn || "Not specified"}<br>
-      <strong>Check-out:</strong> ${checkOut || "Not specified"}<br>
-      <strong>Rooms:</strong> ${rooms || "Not specified"}<br>
-      <strong>Adults:</strong> ${adults || "Not specified"}<br>
-      <strong>Children:</strong> ${children || "Not specified"}<br>
+      <strong>Name:</strong> ${name}
+      <strong>Rating:</strong> ${rating}
+      <strong>Address:</strong> ${address}
+      <strong>Map Link:</strong> <a href="${mapLink}" target="_blank">${mapLink}</a>
+      <strong>Check-in:</strong> ${checkIn || "Not specified"}
+      <strong>Check-out:</strong> ${checkOut || "Not specified"}
+      <strong>Rooms:</strong> ${rooms || "Not specified"}
+      <strong>Adults:</strong> ${adults || "Not specified"}
+      <strong>Children:</strong> ${children || "Not specified"}
       <strong>URL:</strong> <a href="${url}" target="_blank">${url}</a>
     `;
 
