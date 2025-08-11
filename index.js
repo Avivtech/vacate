@@ -7,16 +7,22 @@
     if (!data?.contents) throw new Error('missing contents');
     return data.contents;
   };
+
   const fetchViaAllOriginsRaw = async (url) => {
-    const ep = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&nocache=${Date.now()}`;
-    const r = await fetch(ep, { cache: 'no-store' });
-    if (!r.ok) throw new Error('allorigins/raw ' + r.status);
-    return r.text();
-  };
-  const fetchHTML = async (url) => {
-    try { return await fetchViaAllOriginsGet(url); }
-    catch { return await fetchViaAllOriginsRaw(url); }
-  };
+			const ep = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&nocache=${Date.now()}`;
+			const r = await fetch(ep, { cache: "no-store" });
+			if (!r.ok) throw new Error("allorigins/raw " + r.status);
+			return r.text();
+		};
+
+		const fetchHTML = async (url) => {
+			try {
+				return await fetchViaAllOriginsGet(url);
+			} catch {
+				return await fetchViaAllOriginsRaw(url);
+			}
+		};
+  
   const outerTextOnly = (el) =>
     el ? [...el.childNodes].filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent.trim()).join(' ').trim() : 'Not found';
 
