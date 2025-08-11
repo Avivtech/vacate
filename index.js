@@ -38,7 +38,6 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 		// === Extract Text Info ===
 		const name = doc.querySelector("h2.pp-header__title")?.innerText.trim() || "Not found";
 		const rating = doc.querySelector("[data-review-score]")?.getAttribute("data-review-score") || "Not found";
-
 		const mapEl = doc.querySelector("[data-atlas-latlng]");
 		const latlng = mapEl?.getAttribute("data-atlas-latlng") || "";
 		const mapLink = latlng ? `https://www.google.com/maps?q=${latlng}` : "Not found";
@@ -54,7 +53,18 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 				.trim();
 		}
 
-		resultEl.textContent = JSON.stringify({ name, rating, address, mapLink }, null, 2);
+		resultEl.innerHTML = `
+      <strong>Name:</strong> ${name}<br>
+      <strong>Rating:</strong> ${rating}<br>
+      <strong>Address:</strong> ${address}<br>
+      <strong>Map Link:</strong> <a href="${mapLink}" target="_blank">${mapLink}</a><br>
+      <strong>Check-in:</strong> ${checkIn || "Not specified"}<br>
+      <strong>Check-out:</strong> ${checkOut || "Not specified"}<br>
+      <strong>Rooms:</strong> ${rooms || "Not specified"}<br>
+      <strong>Adults:</strong> ${adults || "Not specified"}<br>
+      <strong>Children:</strong> ${children || "Not specified"}<br>
+      <strong>URL:</strong> <a href="${url}" target="_blank">${url}</a>
+    `;
 
 		// === Extract Images ===
 		let images = [];
