@@ -7,8 +7,8 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 	const checkIn = urlParams.get("checkin");
 	const checkOut = urlParams.get("checkout");
 	const rooms = urlParams.get("no_rooms");
-	const adults = urlParams.get("no_adults");
-	const children = urlParams.get("no_children");
+	const adults = urlParams.get("group_adults");
+	const children = urlParams.get("group_children");
 
 	// Basic validation
 	if (!url || !url.startsWith("http")) {
