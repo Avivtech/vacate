@@ -25,9 +25,8 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 
 	input.value = url;
 
-	const resultEl = document.getElementById("result");
-	const imagesSlider = document.getElementById("imageSlider");
-	resultEl.textContent = "Loading...";
+	const statusEl = document.getElementById("status");
+	statusEl.textContent = "Loading...";
 
 	try {
 		// Fetch page content through AllOrigins
@@ -53,17 +52,31 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 				.trim();
 		}
 
-		resultEl.innerHTML = `
-      <strong>Name:</strong> <a href="${origUrl}" target="_blank">${name}</a>
-      <strong>Rating:</strong> ${rating}
-      <strong>Address:</strong> ${address}
-      <strong>Map Link:</strong> <a href="${mapLink}" target="_blank">${mapLink}</a>
-      <strong>Check-in:</strong> ${checkIn || "Not specified"}
-      <strong>Check-out:</strong> ${checkOut || "Not specified"}
-      <strong>Rooms:</strong> ${rooms || "Not specified"}
-      <strong>Adults:</strong> ${adults || "Not specified"}
-      <strong>Children:</strong> ${children || "Not specified"}
-      <strong>URL:</strong> <a href="${url}" target="_blank">${url}</a>
+		const accItem = document.createElement("div");
+		const accInfo = document.createElement("div");
+		accItem.classList.add("acc-item");
+		accInfo.classList.add("acc-info");
+		accItem.appendChild(accInfo);
+		const imagesSlider = document.createElement("div");
+		imagesSlider.classList.add("swiper");
+		accItem.appendChild(imagesSlider);
+		const swiperWrapper = document.createElement("div");
+		swiperWrapper.classList.add("swiper-wrapper");
+		imagesSlider.appendChild(swiperWrapper);
+		const swiperPagination = document.createElement("div");
+		swiperPagination.classList.add("swiper-pagination");
+		imagesSlider.appendChild(swiperPagination);
+
+		accInfo.innerHTML = `
+      <div class="result-line"><strong>Name:</strong> <a href="${origUrl}" target="_blank">${name}</a><div><strong>Rating:</strong> ${rating}</div></div>
+      <div class="result-line"><strong>Address:</strong> ${address}</div>
+      <div class="result-line"><strong>Map Link:</strong> <a href="${mapLink}" target="_blank">${mapLink}</a></div>
+      <div class="result-line"><strong>Check-in:</strong> ${checkIn || "Not specified"}</div>
+      <div class="result-line"><strong>Check-out:</strong> ${checkOut || "Not specified"}</div>
+      <div class="result-line"><strong>Rooms:</strong> ${rooms || "Not specified"}</div>
+      <div class="result-line"><strong>Adults:</strong> ${adults || "Not specified"}</div>
+      <div class="result-line"><strong>Children:</strong> ${children || "Not specified"}</div>
+      <div class="result-line"><strong>URL:</strong> <a href="${url}" target="_blank">${url}</a></div>
     `;
 
 		// === Extract Images ===
@@ -94,7 +107,7 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 						const slide = document.createElement("div");
 						slide.classList.add("swiper-slide");
 						slide.innerHTML = `<img src="${src}" alt="${alt}" class="slide-img">`;
-						imagesSlider.appendChild(slide);
+						swiperWrapper.appendChild(slide);
 					}
 					resolve();
 				};
@@ -108,14 +121,13 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 		}
 
 		const swiper = new Swiper(".swiper", {
-			loop: true,
 			pagination: {
 				el: ".swiper-pagination",
 			},
 		});
-
 	} catch (err) {
 		console.error(err);
-		resultEl.textContent = "Failed to load the information. Please check the URL and try again.";
+		statusEl.classList.add("error");
+		statusEl.textContent = "Failed to load the information. Please check the URL and try again.";
 	}
 });
