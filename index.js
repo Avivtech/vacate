@@ -1,5 +1,6 @@
 document.getElementById("getHotelDataBtn").addEventListener("click", async () => {
 	const input = document.getElementById("urlInput");
+	const origUrl = input.value.trim();
 	let url = input.value.trim();
 	const urlParams = new URLSearchParams(url);
 
@@ -54,7 +55,7 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 		}
 
 		resultEl.innerHTML = `
-      <strong>Name:</strong> ${name}
+      <strong>Name:</strong> <a href="${origUrl}" target="_blank">${name}</a>
       <strong>Rating:</strong> ${rating}
       <strong>Address:</strong> ${address}
       <strong>Map Link:</strong> <a href="${mapLink}" target="_blank">${mapLink}</a>
@@ -108,6 +109,6 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 		}
 	} catch (err) {
 		console.error(err);
-		resultEl.textContent = "Failed to fetch or parse the URL.";
+		resultEl.textContent = "Failed to load the information. Please check the URL and try again.";
 	}
 });
