@@ -1,9 +1,9 @@
 // Helpers
-const fetchWithTimeout = async (url, ms = 10000) => {
+const fetchWithTimeout = async (inputUrl, ms = 10000) => {
 	const controller = new AbortController();
 	const id = setTimeout(() => controller.abort(), ms);
 	try {
-		const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
+		const res = await fetch(inputUrl, { signal: controller.signal, cache: "no-store" });
 		return res;
 	} catch (err) {
 		// Normalize AbortError -> our own code
@@ -18,8 +18,8 @@ const fetchWithTimeout = async (url, ms = 10000) => {
 	}
 };
 
-const fetchViaAllOriginsGet = async (url) => {
-	const ep = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&nocache=${Date.now()}`;
+const fetchViaAllOriginsGet = async (inputUrl) => {
+	const ep = `https://api.allorigins.win/get?url=${encodeURIComponent(inputUrl)}&nocache=${Date.now()}`;
 	const r = await fetchWithTimeout(ep, 10000);
 	if (!r.ok) throw new Error("allorigins/get " + r.status);
 	const data = await r.json();
@@ -27,28 +27,28 @@ const fetchViaAllOriginsGet = async (url) => {
 	return data.contents;
 };
 
-const fetchViaAllOriginsRaw = async (url) => {
-	const ep = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&nocache=${Date.now()}`;
+const fetchViaAllOriginsRaw = async (inputUrl) => {
+	const ep = `https://api.allorigins.win/raw?url=${encodeURIComponent(inputUrl)}&nocache=${Date.now()}`;
 	const r = await fetchWithTimeout(ep, 10000);
 	if (!r.ok) throw new Error("allorigins/raw " + r.status);
 	return r.text();
 };
 
-const fetchHTML = async (url) => {
+const fetchHTML = async (inputUrl) => {
 	try {
-		return await fetchViaAllOriginsGet(url);
+		return await fetchViaAllOriginsGet(inputUrl);
 	} catch (e1) {
 		// If /get timed out, try /raw once; otherwise rethrow
 		if (e1.code === "ETIMEDOUT") {
 			try {
-				return await fetchViaAllOriginsRaw(url);
+				return await fetchViaAllOriginsRaw(inputUrl);
 			} catch (e2) {
 				throw e2;
 			}
 		}
 		// Non-timeout error on /get -> try /raw as fallback
 		try {
-			return await fetchViaAllOriginsRaw(url);
+			return await fetchViaAllOriginsRaw(inputUrl);
 		} catch (e2) {
 			throw e2;
 		}
@@ -75,11 +75,10 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 	btn.disabled = true;
 	statusEl.textContent = "Loading...";
 
-	const origUrl = input.value.trim();
-	let url = origUrl;
+	const inputUrl = input.value.trim();
 
 	// Basic validation
-	if (!url || !/^https?:\/\//i.test(url)) {
+	if (!inputUrl || !/^https?:\/\//i.test(inputUrl)) {
 		alert("Enter a valid URL that starts with http or https");
 		btn.disabled = false;
 		return;
@@ -88,7 +87,7 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 	// Params from original URL
 	let checkIn, checkOut, rooms, adults, children;
 	try {
-		const u = new URL(origUrl);
+		const u = new URL(inputUrl);
 		const p = u.searchParams;
 		checkIn = p.get("checkin");
 		checkOut = p.get("checkout");
@@ -98,7 +97,7 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 	} catch {}
 
 	try {
-		const html = await fetchHTML(url);
+		const html = await fetchHTML(inputUrl);
 		const doc = new DOMParser().parseFromString(html, "text/html");
 
 		// --- Extract text info
@@ -115,7 +114,7 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 		const accInfo = document.createElement("div");
 		accInfo.classList.add("acc-info");
 		accInfo.innerHTML = `
-        <div class="acc-line"><strong>Name:</strong> <a href="${origUrl}" target="_blank" rel="noopener">${name}</a></div>
+        <div class="acc-line"><strong>Name:</strong> <a href="${inputUrl}" target="_blank" rel="noopener">${name}</a></div>
         <div class="acc-line"><strong>Rating:</strong> ${rating}</div>
         <div class="acc-line"><strong>Address:</strong> ${address}</div>
         <div class="acc-line"><strong>Map Link:</strong> ${mapLink !== "Not found" ? `<a href="${mapLink}" target="_blank" rel="noopener">${mapLink}</a>` : "Not found"}</div>
@@ -124,7 +123,6 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
         <div class="acc-line"><strong>Rooms:</strong> ${rooms || "Not specified"}</div>
         <div class="acc-line"><strong>Adults:</strong> ${adults || "Not specified"}</div>
         <div class="acc-line"><strong>Children:</strong> ${children || "Not specified"}</div>
-        <div class="acc-line"><strong>URL:</strong> <a href="${url}" target="_blank" rel="noopener">${url}</a></div>
     `;
 
 		// Swiper container (unique per item)
