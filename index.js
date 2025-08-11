@@ -1,29 +1,54 @@
 // Helpers
+const fetchWithTimeout = async (url, ms = 10000) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), ms);
+  try {
+    const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+    return res;
+  } catch (err) {
+    // Normalize AbortError -> our own code
+    if (err.name === 'AbortError') {
+      const e = new Error('Request timed out');
+      e.code = 'ETIMEDOUT';
+      throw e;
+    }
+    throw err;
+  } finally {
+    clearTimeout(id);
+  }
+};
+
 const fetchViaAllOriginsGet = async (url) => {
-	const ep = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&nocache=${Date.now()}`;
-	const r = await fetch(ep);
-	if (!r.ok) throw new Error("allorigins/get " + r.status);
-	const data = await r.json();
-	if (!data?.contents) throw new Error("missing contents");
-	return data.contents;
+  const ep = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&nocache=${Date.now()}`;
+  const r = await fetchWithTimeout(ep, 10000);
+  if (!r.ok) throw new Error('allorigins/get ' + r.status);
+  const data = await r.json();
+  if (!data?.contents) throw new Error('missing contents');
+  return data.contents;
 };
 
 const fetchViaAllOriginsRaw = async (url) => {
-	const ep = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&nocache=${Date.now()}`;
-	const r = await fetch(ep, { cache: "no-store" });
-	if (!r.ok) throw new Error("allorigins/raw " + r.status);
-	return r.text();
+  const ep = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&nocache=${Date.now()}`;
+  const r = await fetchWithTimeout(ep, 10000);
+  if (!r.ok) throw new Error('allorigins/raw ' + r.status);
+  return r.text();
 };
 
 const fetchHTML = async (url) => {
-	try {
-		console.log("Fetching via allorigins/get");
-		return await fetchViaAllOriginsGet(url);
-	} catch {
-		console.log("Fetching via allorigins/raw");
-		return await fetchViaAllOriginsRaw(url);
-	}
+  try {
+    return await fetchViaAllOriginsGet(url);
+  } catch (e1) {
+    // If /get timed out, try /raw once; otherwise rethrow
+    if (e1.code === 'ETIMEDOUT') {
+      try { return await fetchViaAllOriginsRaw(url); }
+      catch (e2) { throw e2; }
+    }
+    // Non-timeout error on /get -> try /raw as fallback
+    try { return await fetchViaAllOriginsRaw(url); }
+    catch (e2) { throw e2; }
+  }
 };
+
 
 const outerTextOnly = (el) =>
 	el
@@ -169,8 +194,10 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 
 		statusEl.textContent = "";
 	} catch (err) {
-		console.error(err);
-		statusEl.classList.add("error");
-		statusEl.textContent = "Failed to load the information. Please check the URL and try again.";
-	}
+  console.error(err);
+  statusEl.classList.add("error");
+  statusEl.textContent = (err.code === 'ETIMEDOUT')
+    ? "Request timed out after 10 seconds. Try again."
+    : "Failed to load the information. Please check the URL and try again.";
+}
 });
