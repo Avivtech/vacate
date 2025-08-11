@@ -2,8 +2,13 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 	const input = document.getElementById("urlInput");
 	let url = input.value.trim();
 	const urlParams = new URLSearchParams(url);
-	console.log("Input URL:", url);
-	console.log("URL Parameters:", Object.fromEntries(urlParams.entries()));
+
+	// URL Parameters
+	const checkIn = urlParams.get("checkin");
+	const checkOut = urlParams.get("checkout");
+	const rooms = urlParams.get("no_rooms");
+	const adults = urlParams.get("no_adults");
+	const children = urlParams.get("no_children");
 
 	// Basic validation
 	if (!url || !url.startsWith("http")) {
