@@ -26,9 +26,8 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 	input.value = url;
 
 	const resultEl = document.getElementById("result");
-	const imageList = document.getElementById("imageList");
+	const imagesSlider = document.getElementById("imageSlider");
 	resultEl.textContent = "Loading...";
-	imageList.innerHTML = "";
 
 	try {
 		// Fetch page content through AllOrigins
@@ -92,10 +91,10 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 				tempImg.onload = () => {
 					clearTimeout(timeout);
 					if (tempImg.naturalWidth >= 300) {
-						const li = document.createElement("li");
-						li.classList.add("item");
-						li.innerHTML = `<img src="${src}" class="item-img" alt="${alt}"><div class="item-text">${alt}</div>`;
-						imageList.appendChild(li);
+						const slide = document.createElement("div");
+						slide.classList.add("swiper-slide");
+						slide.innerHTML = `<img src="${src}" alt="${alt}" class="slide-img">`;
+						imagesSlider.appendChild(slide);
 					}
 					resolve();
 				};
@@ -107,6 +106,14 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 				};
 			});
 		}
+
+		const swiper = new Swiper(".swiper", {
+			loop: true,
+			pagination: {
+				el: ".swiper-pagination",
+			},
+		});
+
 	} catch (err) {
 		console.error(err);
 		resultEl.textContent = "Failed to load the information. Please check the URL and try again.";
