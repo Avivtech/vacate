@@ -105,5 +105,30 @@ app.get("/", async (req, res) => {
 	}
 });
 
+// Lightweight image proxy (avoids hotlink blocks)
+app.get("/file", async (req, res) => {
+	const target = (req.query.url || "").toString().trim();
+	if (!target) return res.status(400).send('Missing "url"');
+
+	try {
+		const r = await fetch(target, {
+			redirect: "follow",
+			headers: {
+				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+				Accept: "image/avif,image/webp,image/apng,image/*;q=0.8,*/*;q=0.5",
+				"Accept-Language": "en-US,en;q=0.9",
+				Referer: "https://www.google.com/",
+			},
+		});
+
+		const buf = Buffer.from(await r.arrayBuffer());
+		const ct = r.headers.get("content-type") || "application/octet-stream";
+		res.status(r.status).set("Content-Type", ct).set("Cache-Control", "public, max-age=3600").send(buf);
+	} catch (e) {
+		console.error("File proxy error:", e);
+		res.status(502).send("File proxy error");
+	}
+});
+
 const port = process.env.PORT || 8080;
 app.listen(port, () => console.log("Browser proxy listening on", port));
