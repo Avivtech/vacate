@@ -127,6 +127,7 @@ document.getElementById("getHotelDataBtn").addEventListener("click", async () =>
 		// 1) Fetch & parse HTML
 		const cleanUrl = inputUrl.replace(/(\.html).*/i, "$1"); // keep only .../xxx.html
 		const html = await fetchHTML(cleanUrl);
+		console.log("Proxy raw HTML:", html);
 		const doc = new DOMParser().parseFromString(html, "text/html");
 
 		// 2) Extract info
